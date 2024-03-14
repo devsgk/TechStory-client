@@ -205,27 +205,27 @@ export default function ArticleDetailPage() {
 
                 <div className="space-x-5 text-[14px]">
                   <button
-                    className="px-2 py-1 rounded-md border bg-green-600 text-white"
+                    className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
                     type="submit"
                   >
                     Request review
                   </button>
                   <button
-                    className="px-2 py-1 rounded-md border bg-green-600 text-white"
+                    className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
                     type="button"
                   >
                     Status
                   </button>
                   {isEditing ? (
                     <button
-                      className="px-2 py-1 rounded-md border bg-green-600 text-white"
+                      className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
                       onClick={(e) => handleSaveButton(e)}
                     >
                       Save
                     </button>
                   ) : (
                     <button
-                      className="px-2 py-1 rounded-md border bg-green-600 text-white"
+                      className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
                       onClick={handleModifyButton}
                     >
                       Modify
@@ -251,7 +251,7 @@ export default function ArticleDetailPage() {
           {identity === "reviewer" && (
             <>
               <button
-                className="bg-blue-200 hover:bg-blue-300 px-2 py-1 mt-10 text-[13px] rounded-md border"
+                className="px-2 py-1 mt-10 rounded-md border text-[13px] bg-green-600 hover:bg-green-500 text-white"
                 type="button"
               >
                 Finish Review
@@ -267,8 +267,9 @@ export default function ArticleDetailPage() {
               }}
             />
           ) : (
-            <div className="flex w-full p-2">
+            <div className="flex">
               <div
+                className="w-full p-2"
                 ref={previewRef}
                 dangerouslySetInnerHTML={{ __html: articleContent }}
               />
