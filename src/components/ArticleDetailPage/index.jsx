@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 import { useUserStore } from "../../store/store";
+import TextEditor from "../TextEditor";
 import { addIndent, correctTags } from "../../utils/cleanContent";
 import {
   checkUserIdentity,
@@ -16,6 +17,7 @@ export default function ArticleDetailPage() {
 
   const [articleContent, setArticleContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
   const [reviewersList, setReviewersList] = useState([]);
 
   const editorRef = useRef("");
@@ -23,6 +25,53 @@ export default function ArticleDetailPage() {
 
   const navigate = useNavigate();
   const { articleId } = useParams();
+
+  function handleAddButton(e) {
+    e.preventDefault();
+
+    if (!emailInput.trim()) {
+      return;
+    }
+
+    if (reviewersList.length < 5) {
+      setReviewersList((prev) => [...prev, emailInput]);
+    } else {
+      window.alert("Maximum 5 reviewers allowed!");
+    }
+
+    setEmailInput("");
+  }
+
+  function handleRemoveButton(e) {
+    e.preventDefault();
+
+    const newReviewersList = reviewersList.slice(0, reviewersList.length - 1);
+
+    setReviewersList(newReviewersList);
+  }
+
+  function handleEmailInputChange(e) {
+    setEmailInput(e.target.value);
+  }
+
+  async function handleRequestReviewButton(e) {
+    e.preventDefault();
+
+    if (reviewersList.length === 0) {
+      window.alert("Add reviewers!");
+      return;
+    }
+
+    const url = window.location.href;
+    const emailList = reviewersList;
+
+    await axios.post(`${import.meta.env.VITE_BASE_URL}/articles/email`, {
+      withCredentials: true,
+      emailList,
+      url,
+      articleId,
+    });
+  }
 
   async function handleModifyButton(e) {
     e.preventDefault();
@@ -128,15 +177,30 @@ export default function ArticleDetailPage() {
       {identity !== "unAuthorized" && (
         <div className="ml-20 w-4/5">
           {identity === "author" && (
-            <form className="mt-2 space-y-4 w-full min-h-[90px]">
+            <form
+              className="mt-2 space-y-4 w-full min-h-[90px]"
+              onSubmit={handleRequestReviewButton}
+            >
               <div className="flex items-center justify-between text-[15px]">
                 <div className="flex items-center">
                   <input
                     className="border-2 rounded ml-5 pl-2"
                     placeholder="Enter reviewer's email"
+                    value={emailInput}
+                    onChange={handleEmailInputChange}
                   />
-                  <button className="ml-3 font-bold text-[15px]">+</button>
-                  <button className="ml-3 font-bold text-[20px]">-</button>
+                  <button
+                    className="ml-3 font-bold text-[15px]"
+                    onClick={handleAddButton}
+                  >
+                    +
+                  </button>
+                  <button
+                    className="ml-3 font-bold text-[20px]"
+                    onClick={handleRemoveButton}
+                  >
+                    -
+                  </button>
                 </div>
                 <div className="space-x-5 text-[14px]">
                   <button
