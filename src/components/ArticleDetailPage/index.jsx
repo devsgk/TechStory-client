@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 import { useUserStore } from "../../store/store";
+import { addIndent, correctTags } from "../../utils/cleanContent";
 import {
   checkUserIdentity,
   checkLoggedInStatus,
@@ -10,16 +11,54 @@ import {
 import { handleLogIn } from "../../utils/handleLogin";
 
 export default function ArticleDetailPage() {
-  const { identity, setIsLoggedIn, setUser, setIdentity } = useUserStore();
+  const { user, identity, setIsLoggedIn, setUser, setIdentity } =
+    useUserStore();
 
   const [articleContent, setArticleContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [reviewersList, setReviewersList] = useState([]);
 
   const editorRef = useRef("");
+  const previewRef = useRef("");
 
   const navigate = useNavigate();
   const { articleId } = useParams();
+
+  async function handleModifyButton(e) {
+    e.preventDefault();
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/articles?articleId=${articleId}`,
+      {
+        withCredentials: true,
+      },
+    );
+
+    if (response.data.result === "ok") {
+      const articleContent = response.data.article.editorContent;
+
+      setArticleContent(articleContent);
+      setIsEditing(true);
+    }
+  }
+
+  async function handleSaveButton(e) {
+    e.preventDefault();
+
+    const content = editorRef.current.innerHTML;
+    const contentWithIndent = addIndent(content);
+    const articleContent = correctTags(contentWithIndent);
+
+    setArticleContent(articleContent);
+    setIsEditing(false);
+
+    await axios.post(`${import.meta.env.VITE_BASE_URL}/articles`, {
+      withCredentials: true,
+      user,
+      articleContent,
+      articleId,
+    });
+  }
 
   useEffect(() => {
     async function identifyUser(articleId) {
@@ -94,8 +133,6 @@ export default function ArticleDetailPage() {
                 <div className="flex items-center">
                   <input
                     className="border-2 rounded ml-5 pl-2"
-                    id="reviewer0"
-                    name="reviewer0"
                     placeholder="Enter reviewer's email"
                   />
                   <button className="ml-3 font-bold text-[15px]">+</button>
@@ -115,11 +152,17 @@ export default function ArticleDetailPage() {
                     Status
                   </button>
                   {isEditing ? (
-                    <button className="px-2 py-1 rounded-md border bg-green-600 text-white">
+                    <button
+                      className="px-2 py-1 rounded-md border bg-green-600 text-white"
+                      onClick={(e) => handleSaveButton(e)}
+                    >
                       Save
                     </button>
                   ) : (
-                    <button className="px-2 py-1 rounded-md border bg-green-600 text-white">
+                    <button
+                      className="px-2 py-1 rounded-md border bg-green-600 text-white"
+                      onClick={handleModifyButton}
+                    >
                       Modify
                     </button>
                   )}
