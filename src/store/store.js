@@ -12,4 +12,13 @@ const useUserStore = create((set) => ({
   setUser: (user) => set({ user }),
 }));
 
-export default useUserStore;
+const useReviewListStore = create((set) => ({
+  styleId: "",
+  review: "",
+  status: "pending",
+  setStyleId: (styleId) => set({ styleId }),
+  setReview: (review) => set({ review }),
+  setStatus: (status) => set({ status }),
+}));
+
+export { useUserStore, useReviewListStore };
