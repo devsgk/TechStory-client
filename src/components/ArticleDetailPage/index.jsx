@@ -202,6 +202,7 @@ export default function ArticleDetailPage() {
                     -
                   </button>
                 </div>
+
                 <div className="space-x-5 text-[14px]">
                   <button
                     className="px-2 py-1 rounded-md border bg-green-600 text-white"
@@ -232,6 +233,7 @@ export default function ArticleDetailPage() {
                   )}
                 </div>
               </div>
+
               <div className="flex text-[13px] font-bold ml-3">
                 {reviewersList.length > 0 && <span>Reviewers:</span>}
                 {reviewersList.map((el, index) => (
@@ -244,6 +246,33 @@ export default function ArticleDetailPage() {
                 ))}
               </div>
             </form>
+          )}
+
+          {identity === "reviewer" && (
+            <>
+              <button
+                className="bg-blue-200 hover:bg-blue-300 px-2 py-1 mt-10 text-[13px] rounded-md border"
+                type="button"
+              >
+                Finish Review
+              </button>
+            </>
+          )}
+
+          {isEditing ? (
+            <TextEditor
+              ref={editorRef}
+              properties={{
+                enableResize: true,
+              }}
+            />
+          ) : (
+            <div className="flex w-full p-2">
+              <div
+                ref={previewRef}
+                dangerouslySetInnerHTML={{ __html: articleContent }}
+              />
+            </div>
           )}
         </div>
       )}
