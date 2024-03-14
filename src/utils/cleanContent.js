@@ -27,3 +27,22 @@ export function addIndent(htmlContent) {
 
   return doc.body.innerHTML;
 }
+
+export function correctTags(htmlContent) {
+  const correctedTags = htmlContent
+    .replace(/<br>/g, "<br />")
+    .replace(
+      /<font color="(.*?)">(.*?)<\/font>/g,
+      '<span style="color:$1;">$2</span>',
+    )
+    .replace(
+      /<font color="(.*?)">(.*?)<\/font>/g,
+      '<span style="color:$1;">$2</span>',
+    )
+    .replace(/<div><br><\/div>/g, "")
+    .replace(/<div>/g, "<p>")
+    .replace(/<\/div>/g, "</p>")
+    .replace(/<div><br \/><\/div>/g, "<br />");
+
+  return correctedTags;
+}
