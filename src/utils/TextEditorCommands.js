@@ -38,13 +38,13 @@ export default class TextEditorCommands {
   }
 
   fontSize(n) {
-    if (n === "Small") {
+    if (n === "S") {
       document.execCommand("fontSize", false, String(1));
-    } else if (n === "Medium") {
+    } else if (n === "M") {
       document.execCommand("fontSize", false, String(3));
-    } else if (n === "Large") {
+    } else if (n === "L") {
       document.execCommand("fontSize", false, String(5));
-    } else if (n === "X-Large") {
+    } else if (n === "XL") {
       document.execCommand("fontSize", false, String(7));
     }
   }
