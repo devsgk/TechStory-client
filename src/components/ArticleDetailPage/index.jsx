@@ -1,57 +1,76 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
-import { useUserStore } from "../../store/store";
+import { useUserStore, useReviewListStore } from "../../store/store";
 import TextEditor from "../TextEditor";
+import ReviewFormContainer from "../ReviewFormContainer";
+import ReviewForm from "../ReviewForm";
+import ReviewModal from "../ReviewModal";
+import AuthorActionsForm from "../AuthorActionsForm";
+import Title from "../Title";
+import CommentPopup from "../CommentPopup";
+
 import { addIndent, correctTags } from "../../utils/cleanContent";
+import { handleLogIn } from "../../utils/handleLogin";
 import {
   checkUserIdentity,
   checkLoggedInStatus,
 } from "../../utils/checkPermission";
-import { handleLogIn } from "../../utils/handleLogin";
+import { createPopupModal, styleSelectedArea } from "../../utils/commentPopup";
+import getArticle from "../../utils/getArticle";
+import saveComment from "../../utils/saveComment";
+import deleteComment from "../../utils/deleteComment";
+import "../styles.css";
+import validateReviewerEmail from "../../utils/validateReviewerEmail";
 
 export default function ArticleDetailPage() {
   const { user, identity, setIsLoggedIn, setUser, setIdentity } =
     useUserStore();
+  const { styleId, setStyleId } = useReviewListStore();
 
   const [articleContent, setArticleContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [emailInput, setEmailInput] = useState("");
   const [reviewersList, setReviewersList] = useState([]);
+  const [position, setPosition] = useState(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showPopupModal, setShowPopupModal] = useState(false);
+  const [originalRange, setOriginalRange] = useState(null);
+  const [reviewList, setReviewList] = useState([]);
+  const [hoveredReviewId, setHoveredReviewId] = useState(null);
+  const [title, setTitle] = useState("");
+  const [showTitleError, setShowTitleError] = useState(false);
+  const [isValidReviewer, setIsValidReviewer] = useState(true);
 
   const editorRef = useRef("");
   const previewRef = useRef("");
+  const reviewRef = useRef("");
 
   const navigate = useNavigate();
   const { articleId } = useParams();
 
-  function handleAddButton(e) {
-    e.preventDefault();
+  async function handleAddButton(email) {
+    const isRegistered = await validateReviewerEmail(email);
 
-    if (!emailInput.trim()) {
+    if (!isRegistered) {
+      setIsValidReviewer(false);
       return;
     }
 
+    setIsValidReviewer(true);
+
     if (reviewersList.length < 5) {
-      setReviewersList((prev) => [...prev, emailInput]);
+      setReviewersList((prev) => [...prev, email]);
     } else {
       window.alert("Maximum 5 reviewers allowed!");
     }
-
-    setEmailInput("");
   }
 
-  function handleRemoveButton(e) {
-    e.preventDefault();
-
+  function handleRemoveButton() {
     const newReviewersList = reviewersList.slice(0, reviewersList.length - 1);
 
     setReviewersList(newReviewersList);
-  }
-
-  function handleEmailInputChange(e) {
-    setEmailInput(e.target.value);
   }
 
   async function handleRequestReviewButton(e) {
@@ -94,19 +113,143 @@ export default function ArticleDetailPage() {
   async function handleSaveButton(e) {
     e.preventDefault();
 
+    if (title.trim().length === 0) {
+      setShowTitleError(true);
+
+      return;
+    }
+
     const content = editorRef.current.innerHTML;
+    const textContent = editorRef.current.textContent;
     const contentWithIndent = addIndent(content);
     const articleContent = correctTags(contentWithIndent);
 
     setArticleContent(articleContent);
     setIsEditing(false);
+    setShowTitleError(false);
 
     await axios.post(`${import.meta.env.VITE_BASE_URL}/articles`, {
       withCredentials: true,
       user,
       articleContent,
       articleId,
+      textContent,
+      title,
     });
+  }
+
+  async function handleMouseUp() {
+    const selection = window.getSelection();
+    const originalRange = selection.getRangeAt(0);
+
+    if (originalRange.collapsed) {
+      const updatedArticle = await getArticle(articleId);
+
+      setArticleContent(updatedArticle.editorContent);
+      setShowReviewForm(false);
+      setShowPopupModal(false);
+
+      return;
+    }
+
+    createPopupModal(selection, originalRange, setPosition, setShowPopupModal);
+    setOriginalRange(originalRange);
+  }
+
+  function handlePopupClick() {
+    const span = document.createElement("span");
+    span.id = uuidv4();
+
+    setStyleId(span.id);
+    styleSelectedArea(originalRange, span);
+
+    const styledArticle = previewRef.current.innerHTML;
+
+    setArticleContent(styledArticle);
+    setShowReviewForm(true);
+    setShowPopupModal(false);
+  }
+
+  async function handleReviewFormCancel() {
+    const fetchedArticle = await getArticle(articleId);
+
+    setArticleContent(fetchedArticle.editorContent);
+    setShowReviewForm(false);
+    setShowPopupModal(false);
+
+    return;
+  }
+
+  async function handleReviewFormSave(comment) {
+    if (comment.trim().length === 0) {
+      return null;
+    }
+
+    const content = previewRef.current.innerHTML;
+    const contentWithIndent = addIndent(content);
+    const articleContent = correctTags(contentWithIndent);
+    const commentObj = {
+      comment,
+      styleId,
+      position: { top: position.y },
+      creator: user,
+    };
+
+    setArticleContent(articleContent);
+    setShowReviewForm(false);
+
+    await saveComment(articleContent, articleId, commentObj);
+
+    const updatedArticle = await getArticle(articleId);
+    const fetchedReviewList = updatedArticle.reviewList;
+
+    setReviewList(fetchedReviewList);
+  }
+
+  function handleMouseEnter(e) {
+    const styleId = e.currentTarget.id;
+    const span = document.getElementById(styleId);
+
+    if (span && span !== e.currentTarget) {
+      span.style.backgroundColor = "#F8E473";
+    } else {
+      span.style.backgroundColor = "#FFCCCB";
+    }
+
+    setHoveredReviewId(styleId);
+  }
+
+  function handleMouseLeave(e) {
+    const styleId = e.currentTarget.id;
+    const span = document.getElementById(styleId);
+
+    if (span && span !== e.currentTarget) {
+      span.style.backgroundColor = "#FFFDD0";
+    } else {
+      span.style.backgroundColor = "#FFFFFF";
+    }
+
+    setHoveredReviewId(null);
+  }
+
+  async function handleResolveClick(e) {
+    const styleId = e.target.id;
+
+    const response = await deleteComment(styleId, articleId);
+
+    setArticleContent(response.cleanedArticle);
+    setReviewList(response.article.reviewList);
+  }
+
+  function handleFinishReview() {
+    navigate(`/articles/${articleId}/status`);
+  }
+
+  function handleEmailRemoveClick(e) {
+    const removedEmail = e.target.textContent;
+    const newReviewersList = reviewersList.filter((el) => el !== removedEmail);
+
+    setReviewersList(newReviewersList);
   }
 
   useEffect(() => {
@@ -151,7 +294,9 @@ export default function ArticleDetailPage() {
       );
 
       if (response.data.result === "ok") {
+        setTitle(response.data.article.title);
         setArticleContent(response.data.article.previewContent);
+        setReviewList(response.data.article.reviewList);
 
         const fetchedReviewersList = [];
 
@@ -177,75 +322,36 @@ export default function ArticleDetailPage() {
       {identity !== "unAuthorized" && (
         <div className="ml-20 w-4/5">
           {identity === "author" && (
-            <form
-              className="mt-2 space-y-4 w-full min-h-[90px]"
-              onSubmit={handleRequestReviewButton}
-            >
-              <div className="flex items-center justify-between text-[15px]">
-                <div className="flex items-center">
-                  <input
-                    className="border-2 rounded ml-5 pl-2"
-                    placeholder="Enter reviewer's email"
-                    value={emailInput}
-                    onChange={handleEmailInputChange}
-                  />
-                  <button
-                    className="ml-3 font-bold text-[15px]"
-                    onClick={handleAddButton}
-                  >
-                    +
-                  </button>
-                  <button
-                    className="ml-3 font-bold text-[20px]"
-                    onClick={handleRemoveButton}
-                  >
-                    -
-                  </button>
-                </div>
-
-                <div className="space-x-5 text-[14px]">
-                  <button
-                    className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
-                    type="submit"
-                  >
-                    Request review
-                  </button>
-                  <button
-                    className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
-                    type="button"
-                  >
-                    Status
-                  </button>
-                  {isEditing ? (
-                    <button
-                      className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
-                      onClick={(e) => handleSaveButton(e)}
+            <>
+              <AuthorActionsForm
+                onRequestReviewClick={handleRequestReviewButton}
+                onSave={handleSaveButton}
+                onModify={handleModifyButton}
+                isEditing={isEditing}
+                onAddReviewer={handleAddButton}
+                onRemoveReviewer={handleRemoveButton}
+                articleId={articleId}
+                isValidReviewer={isValidReviewer}
+              />
+              <div className="flex text-sm font-bold ml-3 my-2 py-2 items-center">
+                {<span className="my-4 py-3 text-[17px]">Reviewers:</span>}
+                {reviewersList.length === 0 ? (
+                  <div className="m-4 text-red-400">No reviewers added</div>
+                ) : (
+                  reviewersList.map((el, index) => (
+                    <div
+                      className="relative group m-4"
+                      key={el}
+                      onClick={handleEmailRemoveClick}
                     >
-                      Save
-                    </button>
-                  ) : (
-                    <button
-                      className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
-                      onClick={handleModifyButton}
-                    >
-                      Modify
-                    </button>
-                  )}
-                </div>
+                      <span className="text-green-600 p-2 border border-transparent hover:border-red-500 hover:bg-red-50 rounded shake cursor-pointer inline-block">
+                        {el}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
-
-              <div className="flex text-[13px] font-bold ml-3">
-                {reviewersList.length > 0 && <span>Reviewers:</span>}
-                {reviewersList.map((el, index) => (
-                  <span className="text-blue-700" key={el}>
-                    <span className="ml-4 mr-4">
-                      {index !== 0 && index !== reviewersList.length && "|"}
-                    </span>
-                    {el}
-                  </span>
-                ))}
-              </div>
-            </form>
+            </>
           )}
 
           {identity === "reviewer" && (
@@ -253,6 +359,7 @@ export default function ArticleDetailPage() {
               <button
                 className="px-2 py-1 mt-10 rounded-md border text-[13px] bg-green-600 hover:bg-green-500 text-white"
                 type="button"
+                onClick={handleFinishReview}
               >
                 Finish Review
               </button>
@@ -260,21 +367,60 @@ export default function ArticleDetailPage() {
           )}
 
           {isEditing ? (
-            <TextEditor
-              ref={editorRef}
-              properties={{
-                enableResize: true,
-              }}
-            />
-          ) : (
-            <div className="flex">
-              <div
-                className="w-full p-2"
-                ref={previewRef}
-                dangerouslySetInnerHTML={{ __html: articleContent }}
+            <>
+              <Title
+                title={title}
+                onTitleChange={(e) => setTitle(e.target.value)}
+                showTitleError={showTitleError}
               />
-            </div>
+              <TextEditor
+                ref={editorRef}
+                properties={{
+                  enableResize: true,
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Title
+                title={title}
+                onTitleChange={(e) => setTitle(e.target.value)}
+                readOnly={true}
+              />
+              <div className="flex">
+                <div
+                  className="w-full p-2"
+                  onMouseUp={handleMouseUp}
+                  ref={previewRef}
+                  dangerouslySetInnerHTML={{ __html: articleContent }}
+                />
+              </div>
+            </>
           )}
+
+          {showPopupModal && (
+            <CommentPopup position={position} onPopupClick={handlePopupClick} />
+          )}
+
+          {showReviewForm && (
+            <ReviewFormContainer position={position} ref={reviewRef}>
+              <ReviewForm
+                onReviewFormSave={(comment) => handleReviewFormSave(comment)}
+                onReviewFormCancel={handleReviewFormCancel}
+              />
+            </ReviewFormContainer>
+          )}
+
+          {reviewList.map((el) => (
+            <ReviewModal
+              key={el.styleId}
+              element={el}
+              hoveredReviewId={hoveredReviewId}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onResolveClick={handleResolveClick}
+            />
+          ))}
         </div>
       )}
     </>
