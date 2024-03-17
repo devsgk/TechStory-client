@@ -3,7 +3,7 @@ import { signInWithPopup, signOut } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../../config/firebase";
-import useUserStore from "../../store/store";
+import { useUserStore } from "../../store/store";
 
 export default function Header() {
   const { user, setUser, isLoggedIn, setIsLoggedIn } = useUserStore();
@@ -62,6 +62,8 @@ export default function Header() {
     } catch (error) {
       console.log(error);
     }
+
+    setIsUserNameClicked(false);
   }
 
   function handleUserNameClick() {
@@ -83,6 +85,8 @@ export default function Header() {
       setUser(response.data.user);
     }
 
+    setIsUserNameClicked(false);
+
     return response.data.result;
   }
 
@@ -94,13 +98,17 @@ export default function Header() {
     } else {
       handleLogIn();
     }
+
+    setIsUserNameClicked(false);
   }
 
   function handleLogoClick() {
+    setIsUserNameClicked(false);
     navigate("/");
   }
 
   function handleMyArticlesClick() {
+    setIsUserNameClicked(false);
     navigate(`/users/${user._id}/articles`);
   }
 
@@ -149,27 +157,29 @@ export default function Header() {
               {user.displayName}
             </button>
             {isUserNameClicked && (
-              <div className="absolute top-[65px] right-10 flex flex-col rounded-md border-b shadow-md bg-yellow-100">
+              <div className="absolute top-[65px] right-10 flex flex-col rounded  bg-white shadow-xl border">
                 <div className="flex flex-col text-[15px]">
-                  <div className="flex items-center hover:bg-slate-100 hover:rounded-md cursor-pointer">
+                  <div
+                    className="flex items-center hover:bg-slate-100 hover:rounded-md cursor-pointer"
+                    onClick={handleMyArticlesClick}
+                  >
                     <img
                       className="w-4 justify-center items-center m-3"
                       src="/assets/articlesLogo.png"
                       alt="articles logo"
                     />
-                    <button className="mx-4" onClick={handleMyArticlesClick}>
-                      My articles
-                    </button>
+                    <button className="mx-4">My articles</button>
                   </div>
-                  <div className="flex items-center hover:bg-slate-100 hover:rounded-md cursor-pointer">
+                  <div
+                    className="flex items-center hover:bg-slate-100 hover:rounded-md cursor-pointer"
+                    onClick={handleLogOut}
+                  >
                     <img
                       className="w-4 justify-center items-center  m-3"
                       src="/assets/logOutLogo.png"
                       alt="logOutLogo"
                     />
-                    <button className="mx-4" onClick={handleLogOut}>
-                      Log Out
-                    </button>
+                    <button className="mx-4">Log Out</button>
                   </div>
                 </div>
               </div>
@@ -177,7 +187,7 @@ export default function Header() {
           </div>
         ) : (
           <button
-            className="mr-10 px-6 py-2 bg-black text-white rounded-full"
+            className="mr-10 px-10 py-1 bg-black text-white rounded-full"
             onClick={handleLogIn}
           >
             Get started
