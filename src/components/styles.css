@@ -1,0 +1,29 @@
+@keyframes shake {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(1deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.shake:hover {
+  animation: shake 0.2s infinite;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.shake-alert {
+  animation: shake 0.4s infinite;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
