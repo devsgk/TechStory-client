@@ -25,7 +25,8 @@ export async function checkUserIdentity(articleId, userData) {
   const isReviewer = data.article.reviewers.some(
     (el) => el.user === userData._id,
   );
-  const isAuthor = data.article.author === userData._id;
+
+  const isAuthor = data.article.author._id === userData._id;
   let identity;
 
   if (isReviewer) {
