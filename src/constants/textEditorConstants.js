@@ -9,4 +9,4 @@ export const COLORS = [
   "black",
   "white",
 ];
-export const FONT_SIZES = ["Small", "Medium", "Large", "X-Large"];
+export const FONT_SIZES = ["S", "M", "L", "XL"];
