@@ -1,7 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-
 export default function CommentPopup({ position, onPopupClick }) {
-  console.log(position.x);
   const modalStyle = {
     top: `${position.y}px`,
     left: `${position.x - 20}px`,
