@@ -13,17 +13,27 @@ export default function NewArticle() {
   const [isSaveClicked, setIsSaveClicked] = useState(false);
   const [input, setInput] = useState("");
   const [articleId, setArticleId] = useState("");
+  const [title, setTitle] = useState("");
+  const [showTitleError, setShowTitleError] = useState(false);
 
   const ref = useRef("");
   const navigate = useNavigate();
 
   async function handleSaveButton() {
+    if (title.trim().length === 0) {
+      setShowTitleError(true);
+
+      return;
+    }
+
     const content = ref.current.innerHTML;
+    const textContent = ref.current.textContent;
     const contentWithIndent = addIndent(content);
     const articleContent = correctTags(contentWithIndent);
 
     setInput(articleContent);
     setIsEditing((prev) => !prev);
+    setShowTitleError(false);
 
     const response = await axios.post(
       `${import.meta.env.VITE_BASE_URL}/articles`,
@@ -32,6 +42,8 @@ export default function NewArticle() {
         user,
         articleContent,
         articleId,
+        textContent,
+        title,
       },
     );
 
@@ -69,10 +81,19 @@ export default function NewArticle() {
   }, [isEditing, input]);
 
   return (
-    <div className="flex flex-col justify-center mx-10">
+    <div
+      className="flex flex-col justify-center mx-10"
+      style={{ paddingLeft: "10%", paddingRight: "10%" }}
+    >
       <div className="flex flex-col w-full mt-10">
         {!isSaveClicked ? (
           <>
+            <input
+              className={`text-5xl outline-none ${title.trim().length === 0 && showTitleError ? "border-red-500 border-2 rounded-md" : ""} w-full mb-5 text-center`}
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
             <TextEditor
               ref={ref}
               properties={{
