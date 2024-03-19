@@ -320,7 +320,7 @@ export default function ArticleDetailPage() {
   return (
     <>
       {identity !== "unAuthorized" && (
-        <div className="ml-20 w-4/5">
+        <div className="w-4/5" style={{ paddingLeft: "19%" }}>
           {identity === "author" && (
             <>
               <AuthorActionsForm
