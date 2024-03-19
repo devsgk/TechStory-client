@@ -25,11 +25,12 @@ export default function MainPage() {
       <div
         className="flex flex-col justify-center pl-7 bg-[#ffbf16]
     border-b-[1px] border-black"
+        style={{ paddingLeft: "19%" }}
       >
-        <h1 className="mt-[100px] mb-[20px] text-7xl">
-          <p>Stay hungry.</p>
+        <h1 className="mt-[100px] mb-[20px] text-[106px]">
+          <p className="font-serif">Stay hungry.</p>
         </h1>
-        <div className="mt-3 text-2xl w-[450px]">
+        <div className="mt-3 text-2xl w-[500px]">
           Explore stories, insights, and experiences from experts in tech
           industry.
         </div>
@@ -40,7 +41,7 @@ export default function MainPage() {
           Start reading
         </button>
       </div>
-      <div ref={mainRef}>
+      <div ref={mainRef} style={{ paddingLeft: "19%" }}>
         <ArticlePreview onClick={handlePreviewClick} />
       </div>
     </>
