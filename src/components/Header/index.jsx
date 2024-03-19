@@ -134,6 +134,7 @@ export default function Header() {
     <div
       className="flex items-center py-5 pl-7 bg-[#ffbf16]
     ] border-b-[1px] border-black sticky top-0 z-10"
+      style={{ paddingLeft: "19%", paddingRight: "19%" }}
     >
       <button
         className="font-bold text-[25px] cursor-pointer"
@@ -143,7 +144,7 @@ export default function Header() {
       </button>
       <div className="flex ml-auto text-[15px] font-light">
         <button
-          className="mr-10 px-10 bg-black text-white rounded-full"
+          className="ml-10 px-10 bg-black text-white rounded-full"
           onClick={handleWriteClick}
         >
           Write
@@ -151,13 +152,13 @@ export default function Header() {
         {isLoggedIn ? (
           <div ref={userNameRef}>
             <button
-              className="mr-10 px-4 py-1 bg-black text-white rounded-full"
+              className="ml-10 px-4 py-1 bg-black text-white rounded-full"
               onClick={handleUserNameClick}
             >
               {user.displayName}
             </button>
             {isUserNameClicked && (
-              <div className="absolute top-[65px] right-10 flex flex-col rounded  bg-white shadow-xl border">
+              <div className="absolute top-[65px] right-30 flex flex-col rounded  bg-white shadow-xl border">
                 <div className="flex flex-col text-[15px]">
                   <div
                     className="flex items-center hover:bg-slate-100 hover:rounded-md cursor-pointer"
@@ -187,7 +188,7 @@ export default function Header() {
           </div>
         ) : (
           <button
-            className="mr-10 px-10 py-1 bg-black text-white rounded-full"
+            className="ml-10 px-10 py-1 bg-black text-white rounded-full"
             onClick={handleLogIn}
           >
             Get started
