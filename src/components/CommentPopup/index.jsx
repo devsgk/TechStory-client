@@ -9,7 +9,7 @@ export default function CommentPopup({ position, onPopupClick }) {
   return (
     <>
       <div
-        className="border bg-white hover:bg-gray-100 p-2 rounded shadow-md text-xs cursor-pointer"
+        className="border bg-white hover:bg-gray-200 p-2 rounded shadow-md text-xs cursor-pointer"
         style={modalStyle}
         onClick={onPopupClick}
       >
