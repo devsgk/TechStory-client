@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+
 import "../styles.css";
 
 const AuthorActionsForm = ({
@@ -9,9 +11,12 @@ const AuthorActionsForm = ({
   onModify,
   isEditing,
   onAddReviewer,
-  onRemoveReviewer,
   articleId,
   isValidReviewer,
+  onDelete,
+  requestStatus,
+  reviewersList,
+  onRemoveEmail,
 }) => {
   const [emailInput, setEmailInput] = useState("");
 
@@ -32,77 +37,94 @@ const AuthorActionsForm = ({
     setEmailInput("");
   }
 
-  function handleRemoveButton(e) {
-    e.preventDefault();
-
-    onRemoveReviewer();
-  }
-
   function handleStatusButton() {
     navigate(`/articles/${articleId}/status`);
   }
 
   return (
-    <form className="my-2 space-y-4 w-full" onSubmit={onRequestReviewClick}>
+    <form
+      className="my-2 mt-5 space-y-4 w-full"
+      onSubmit={onRequestReviewClick}
+    >
       <div className="flex items-center justify-between text-[15px]">
         <div className="flex items-center">
+          <img src="/assets/gmail.png" alt="gmail icon" className="w-7 h-7" />
           <input
-            className={`border-2 outline-none rounded ml-5 pl-2 ${isValidReviewer ? "" : "border-red-500"}`}
+            className={`border-2 outline-none rounded ml-2 pl-2 ${isValidReviewer ? "" : "border-red-500"}`}
             placeholder="Enter reviewer's email"
             value={emailInput}
             onChange={handleEmailInputChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAddButton(e);
+              }
+            }}
           />
-          <button
-            className="ml-3 font-bold text-[15px]"
-            onClick={handleAddButton}
-          >
-            +
-          </button>
-          <button
-            className="ml-3 font-bold text-[20px]"
-            onClick={handleRemoveButton}
-          >
-            -
-          </button>
-          <p
-            className={`ml-5 text-red-600 fade-out ${isValidReviewer ? "" : "shake-alert"}`}
-          >
-            {isValidReviewer
-              ? ""
-              : "You can't add unregistered user as a reviewer!"}
-          </p>
         </div>
-
-        <div className="space-x-5 text-[14px]">
+        <div className="flex text-sm font-bold ml-3 items-center">
+          {reviewersList.length > 0 &&
+            reviewersList.map((el, index) => (
+              <div className="relative group" key={el} onClick={onRemoveEmail}>
+                <span className="text-green-600 p-2 border border-transparent hover:border-red-500 hover:bg-red-50 rounded shake cursor-pointer inline-block">
+                  {el}
+                </span>
+              </div>
+            ))}
+        </div>
+        <div className="flex space-x-3 text-[14px]">
           <button
-            className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
+            className="p-2 rounded-md border hover:bg-gray-100"
+            type="button"
+            onClick={() => navigate(-1)}
+          >
+            <IoIosArrowBack />
+          </button>
+          <button
+            className="px-2 py-1 w-[120px] rounded-md border hover:bg-green-400"
             type="submit"
           >
-            Request review
+            {requestStatus === "idle" && "Request review"}
+            {requestStatus === "loading" && "Sending..."}
           </button>
           <button
-            className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
+            className="p-2 rounded-md border hover:bg-gray-100"
             type="button"
             onClick={handleStatusButton}
           >
-            Status
+            <IoIosArrowForward />
           </button>
-          {isEditing ? (
-            <button
-              className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
-              onClick={onSave}
-            >
-              Save
-            </button>
-          ) : (
-            <button
-              className="px-2 py-1 rounded-md border bg-green-600 hover:bg-green-500 text-white"
-              onClick={onModify}
-            >
-              Modify
-            </button>
-          )}
         </div>
+      </div>
+      <hr className="mb-10" />
+      <div className="flex justify-end space-x-2">
+        <p
+          className={`ml-[40px] text-red-600 fade-out ${isValidReviewer ? "hidden" : "shake-alert"} mr-auto`}
+        >
+          {isValidReviewer ? "" : "Ask him to sign up first!"}
+        </p>
+
+        {isEditing ? (
+          <button
+            className="px-2 py-1 rounded-md border hover:bg-green-400 text-[14px]"
+            onClick={onSave}
+          >
+            Save
+          </button>
+        ) : (
+          <button
+            className="px-2 py-1 rounded-md border hover:bg-gray-100 text-[14px]"
+            onClick={onModify}
+          >
+            Modify
+          </button>
+        )}
+        <button
+          className="px-2 py-1 rounded-md border hover:bg-gray-100 text-[14px]"
+          onClick={onDelete}
+          type="button"
+        >
+          DELETE
+        </button>
       </div>
     </form>
   );
