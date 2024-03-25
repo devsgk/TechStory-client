@@ -78,7 +78,7 @@ export default function ArticlePreview({ onClick }) {
       {articlesList.length > 0 &&
         articlesList.map((el, index) => (
           <div
-            className="ml-5 w-2/3 cursor-pointer"
+            className="ml-5 cursor-pointer"
             key={el._id}
             onClick={() => onClick(el)}
           >
