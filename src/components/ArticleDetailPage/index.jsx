@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import DOMPurify from "dompurify";
 
 import { useUserStore, useReviewListStore } from "../../store/store";
 import TextEditor from "../TextEditor";
@@ -24,6 +25,13 @@ import saveComment from "../../utils/saveComment";
 import deleteComment from "../../utils/deleteComment";
 import "../styles.css";
 import validateReviewerEmail from "../../utils/validateReviewerEmail";
+import deleteArticle from "../../utils/deleteArticle";
+import { CiCirclePlus } from "react-icons/ci";
+import { FaImage } from "react-icons/fa";
+import { handleFileUpload } from "../../utils/styleText";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import SavedModal from "../SavedModal";
+import ModifyingModal from "../ModifyingModal";
 
 export default function ArticleDetailPage() {
   const { user, identity, setIsLoggedIn, setUser, setIdentity } =
@@ -42,10 +50,16 @@ export default function ArticleDetailPage() {
   const [title, setTitle] = useState("");
   const [showTitleError, setShowTitleError] = useState(false);
   const [isValidReviewer, setIsValidReviewer] = useState(true);
+  const [requestStatus, setRequestStatus] = useState("idle");
+  const [iconPosition, setIconPosition] = useState({ x: -10000, y: -10000 });
+  const [isCircleClicked, setIsCircleClicked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isModifying, setIsModifying] = useState(false);
 
   const editorRef = useRef("");
   const previewRef = useRef("");
   const reviewRef = useRef("");
+  const titleInputRef = useRef();
 
   const navigate = useNavigate();
   const { articleId } = useParams();
@@ -60,10 +74,10 @@ export default function ArticleDetailPage() {
 
     setIsValidReviewer(true);
 
-    if (reviewersList.length < 5) {
+    if (reviewersList.length < 3) {
       setReviewersList((prev) => [...prev, email]);
     } else {
-      window.alert("Maximum 5 reviewers allowed!");
+      window.alert("Maximum 2 reviewers allowed!");
     }
   }
 
@@ -81,15 +95,29 @@ export default function ArticleDetailPage() {
       return;
     }
 
+    setRequestStatus("loading");
+
     const url = window.location.href;
     const emailList = reviewersList;
 
-    await axios.post(`${import.meta.env.VITE_BASE_URL}/articles/email`, {
-      withCredentials: true,
-      emailList,
-      url,
-      articleId,
-    });
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/articles/email`,
+        {
+          withCredentials: true,
+          emailList,
+          url,
+          articleId,
+        },
+      );
+
+      if (response.data.result === "ok") {
+        setRequestStatus("idle");
+        window.alert("Request sent successfully!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async function handleModifyButton(e) {
@@ -107,6 +135,8 @@ export default function ArticleDetailPage() {
 
       setArticleContent(articleContent);
       setIsEditing(true);
+      setIsSaved(false);
+      setIsModifying(true);
     }
   }
 
@@ -127,6 +157,8 @@ export default function ArticleDetailPage() {
     setArticleContent(articleContent);
     setIsEditing(false);
     setShowTitleError(false);
+    setIsSaved(true);
+    setIsModifying(false);
 
     await axios.post(`${import.meta.env.VITE_BASE_URL}/articles`, {
       withCredentials: true,
@@ -136,6 +168,16 @@ export default function ArticleDetailPage() {
       textContent,
       title,
     });
+  }
+
+  async function handleDeleteButton(e) {
+    e.stopPropagation();
+
+    if (confirm("Are you sure you want to DELETE the article?")) {
+      await deleteArticle(articleId);
+
+      navigate(`/users/${user._id}/articles`);
+    }
   }
 
   async function handleMouseUp() {
@@ -317,10 +359,70 @@ export default function ArticleDetailPage() {
     }
   }, [isEditing, articleContent]);
 
+  function handleEditorEvents() {
+    const position = getCaretPosition();
+
+    setIconPosition(position);
+  }
+
+  function getCaretPosition() {
+    const selection = window.getSelection();
+
+    if (!selection.rangeCount) {
+      return { x: -10000, y: -10000 };
+    }
+
+    const range = selection.getRangeAt(0).cloneRange();
+
+    range.collapse(true);
+
+    const dummySpan = document.createElement("span");
+
+    dummySpan.textContent = "\u200B";
+    range.insertNode(dummySpan);
+
+    const rect = dummySpan.getBoundingClientRect();
+
+    const editorOffsetLeft = editorRef.current.offsetLeft;
+
+    const lineHeight = parseInt(
+      window.getComputedStyle(dummySpan.parentNode).lineHeight,
+    );
+    const yPosition = rect.top + rect.height - lineHeight / 2 + window.scrollY;
+    const position = { x: editorOffsetLeft, y: yPosition };
+
+    if (parseInt(position.y) === 182) {
+      position.y += 15;
+    } else if (parseInt(position.y) === 347) {
+      position.y -= 10;
+    } else {
+    }
+    dummySpan.parentNode.removeChild(dummySpan);
+
+    return position;
+  }
+
+  function handleCircleClick() {
+    setIsCircleClicked((prev) => !prev);
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Tab" || e.key === "Enter") {
+      e.preventDefault();
+
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+    }
+  }
+
   return (
     <>
       {identity !== "unAuthorized" && (
-        <div className="w-4/5" style={{ paddingLeft: "19%" }}>
+        <div
+          className="mx-10"
+          style={{ paddingLeft: "10%", paddingRight: "10%" }}
+        >
           {identity === "author" && (
             <>
               <AuthorActionsForm
@@ -332,53 +434,117 @@ export default function ArticleDetailPage() {
                 onRemoveReviewer={handleRemoveButton}
                 articleId={articleId}
                 isValidReviewer={isValidReviewer}
+                onDelete={handleDeleteButton}
+                requestStatus={requestStatus}
+                reviewersList={reviewersList}
+                onRemoveEmail={handleRemoveButton}
               />
-              <div className="flex text-sm font-bold ml-3 my-2 py-2 items-center">
-                {<span className="my-4 py-3 text-[17px]">Reviewers:</span>}
-                {reviewersList.length === 0 ? (
-                  <div className="m-4 text-red-400">No reviewers added</div>
-                ) : (
-                  reviewersList.map((el, index) => (
-                    <div
-                      className="relative group m-4"
-                      key={el}
-                      onClick={handleEmailRemoveClick}
-                    >
-                      <span className="text-green-600 p-2 border border-transparent hover:border-red-500 hover:bg-red-50 rounded shake cursor-pointer inline-block">
-                        {el}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
             </>
           )}
 
           {identity === "reviewer" && (
-            <>
+            <div className="flex my-5 justify-end space-x-3 mb-[80px]">
               <button
-                className="px-2 py-1 mt-10 rounded-md border text-[13px] bg-green-600 hover:bg-green-500 text-white"
+                className="p-2 rounded-md border hover:bg-gray-100"
+                type="button"
+                onClick={() => navigate(-1)}
+              >
+                <IoIosArrowBack />
+              </button>
+              <button
+                className="px-2 py-1 rounded-md border text-[13px] hover:bg-gray-100"
                 type="button"
                 onClick={handleFinishReview}
               >
                 Finish Review
               </button>
-            </>
+              <button
+                className="p-2 rounded-md border hover:bg-gray-100"
+                type="button"
+                onClick={handleFinishReview}
+              >
+                <IoIosArrowForward />
+              </button>
+            </div>
           )}
+
+          <SavedModal isOpen={isSaved} />
+          <ModifyingModal isOpen={isModifying} />
 
           {isEditing ? (
             <>
-              <Title
-                title={title}
-                onTitleChange={(e) => setTitle(e.target.value)}
-                showTitleError={showTitleError}
+              <input
+                className={`text-5xl outline-none ${title.trim().length === 0 && showTitleError ? "border-red-500 border-2 rounded-md" : ""} w-full mb-5`}
+                placeholder="  Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                ref={titleInputRef}
+                onFocus={handleEditorEvents}
+                onKeyUp={handleEditorEvents}
+                onClick={() => {
+                  handleEditorEvents();
+                  setIsCircleClicked(false);
+                }}
+                onKeyDown={handleKeyDown}
+                spellCheck="false"
               />
               <TextEditor
                 ref={editorRef}
                 properties={{
                   enableResize: true,
                 }}
+                onFocus={handleEditorEvents}
+                onKeyUp={() => {
+                  handleEditorEvents();
+                  setIsCircleClicked(false);
+                }}
+                onClick={() => {
+                  handleEditorEvents();
+                  setIsCircleClicked(false);
+                }}
               />
+              <div className="flex">
+                <div
+                  className="absolute mt-[-13px]"
+                  style={{
+                    left: iconPosition.x - 40,
+                    top: iconPosition.y,
+                  }}
+                >
+                  <CiCirclePlus
+                    className="cursor-pointer transition-transform duration-300 ease-in-out"
+                    style={{
+                      transform: `rotate(${isCircleClicked ? 45 : 0}deg)`,
+                    }}
+                    size={30}
+                    onClick={handleCircleClick}
+                  />
+                </div>
+                {isCircleClicked && (
+                  <div
+                    className="absolute hover:bg-gray-200 rounded-md p-1 h-[30px] items-center justify-center"
+                    style={{
+                      left: iconPosition.x - 32,
+                      top: iconPosition.y + 30,
+                    }}
+                  >
+                    <button>
+                      <label
+                        className="rounded-md text-center m-auto cursor-pointer"
+                        htmlFor="files"
+                      >
+                        <FaImage size={25} />
+                      </label>
+                      <input
+                        id="files"
+                        className="hidden"
+                        type="file"
+                        onChange={(e) => handleFileUpload(e, editorRef)}
+                      />
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -389,10 +555,13 @@ export default function ArticleDetailPage() {
               />
               <div className="flex">
                 <div
-                  className="w-full p-2"
+                  className="w-full mb-10 break-after-all"
+                  style={{ fontSize: "21px" }}
                   onMouseUp={handleMouseUp}
                   ref={previewRef}
-                  dangerouslySetInnerHTML={{ __html: articleContent }}
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(articleContent),
+                  }}
                 />
               </div>
             </>
