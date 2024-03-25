@@ -13,12 +13,12 @@ export default function ReviewModal({
   return (
     <div
       className="absolute bg-white p-2 rounded border mr-10 hover:bg-gray-100"
-      style={{ ...position, right: 0 }}
+      style={{ top: position.top + 20, right: 0 }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       id={styleId}
     >
-      <form className="flex flex-col w-[150px]">
+      <form className="flex flex-col w-[115px]">
         <div className="flex gap-2 mb-2 items-center">
           <img
             className="rounded-full"

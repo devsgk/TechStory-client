@@ -1,6 +1,8 @@
+import { forwardRef } from "react";
 import TextEditorTools from "../TextEditorTools";
 
-export default function PopupModal({ position, onPopupClick }) {
+const PopupModal = forwardRef((props, ref) => {
+  const { position, onPopupClick } = props.properties;
   const modalStyle = {
     top: `${position.y}px`,
     left: `${position.x - 80}px`,
@@ -15,8 +17,10 @@ export default function PopupModal({ position, onPopupClick }) {
         style={modalStyle}
         onClick={onPopupClick}
       >
-        <TextEditorTools />
+        <TextEditorTools ref={ref} />
       </div>
     </>
   );
-}
+});
+
+export default PopupModal;

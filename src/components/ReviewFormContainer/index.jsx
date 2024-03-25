@@ -3,7 +3,7 @@ import React from "react";
 const ReviewFormContainer = React.forwardRef(({ children, position }, ref) => {
   const containerStyle = {
     top: `${position.y + 15}px`,
-    right: "30px",
+    right: 0,
     position: "absolute",
     zIndex: 1001,
   };
