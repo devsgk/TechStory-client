@@ -1,5 +1,4 @@
 import React, { forwardRef, useRef, useState } from "react";
-import { AiOutlineOrderedList } from "react-icons/ai";
 import { BiFontSize } from "react-icons/bi";
 import { CgColorBucket } from "react-icons/cg";
 import {
@@ -8,7 +7,6 @@ import {
   FiAlignRight,
   FiBold,
   FiItalic,
-  FiList,
   FiUnderline,
 } from "react-icons/fi";
 import { FaImage } from "react-icons/fa";
@@ -58,7 +56,7 @@ const TextEditorTools = forwardRef((props, ref) => {
         </button>
 
         <button onClick={() => commands.alignRight()}>
-          <FiAlignCenter />
+          <FiAlignRight />
         </button>
 
         <button
