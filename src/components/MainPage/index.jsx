@@ -41,7 +41,11 @@ export default function MainPage() {
           Start reading
         </button>
       </div>
-      <div className="mt-[100px]" ref={mainRef} style={{ paddingLeft: "19%" }}>
+      <div
+        className="mt-[100px]"
+        ref={mainRef}
+        style={{ paddingLeft: "19%", paddingRight: "19%" }}
+      >
         <ArticlePreview onClick={handlePreviewClick} />
       </div>
     </>
