@@ -1,4 +1,4 @@
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 
 import PopupModal from "../PopupModal";
 
@@ -7,49 +7,65 @@ import TextEditorCommands from "../../utils/TextEditorCommands";
 
 import "./style.css";
 
-const TextEditor = forwardRef((props, ref) => {
-  const [position, setPosition] = useState(null);
-  const [showPopupModal, setShowPopupModal] = useState(false);
+const TextEditor = forwardRef(
+  ({ properties, onFocus, onKeyUp, onClick }, ref) => {
+    const [position, setPosition] = useState(null);
+    const [showPopupModal, setShowPopupModal] = useState(false);
+    const { enableResize = false } = properties;
 
-  const { enableResize = false } = props.properties;
+    function handleMouseUp() {
+      const selection = window.getSelection();
+      const originalRange = selection.getRangeAt(0);
 
-  function handleMouseUp() {
-    const selection = window.getSelection();
-    const originalRange = selection.getRangeAt(0);
+      if (originalRange.collapsed) {
+        setShowPopupModal(false);
 
-    if (originalRange.collapsed) {
-      setShowPopupModal(false);
+        return;
+      }
 
-      return;
+      createPopupModal(
+        selection,
+        originalRange,
+        setPosition,
+        setShowPopupModal,
+      );
     }
 
-    createPopupModal(selection, originalRange, setPosition, setShowPopupModal);
-  }
+    function handlePopupClick() {
+      console.log("popup clicked");
+    }
 
-  function handlePopupClick() {
-    console.log("popup clicked");
-  }
-
-  return (
-    <div
-      className={`TextEditor flex flex-col w-full h-[500px] overflow-hidden ${enableResize ? "resize-y" : "resize-none"}`}
-    >
-      <div
-        className={`TextareaWrapper w-full h-screen overflow-y-auto ${enableResize ? "resize-y" : "resize-none"}`}
-      >
+    return (
+      <div className={`flex flex-col w-full overflow-y-auto mb-10`}>
+        {ref.current?.innerHTML === "" && (
+          <span className="absolute pl-9 text-gray-300 z-[-10] text-[21px]">
+            Tell me your story...
+          </span>
+        )}
         <div
-          className="w-full outline-none p-2 pr-0 break-all h-full min-h-screen overflow-y-auto"
+          className="w-full outline-none pr-0 break-after-all"
           ref={ref}
           contentEditable
           onMouseUp={handleMouseUp}
           spellCheck="false"
+          onKeyUp={onKeyUp}
+          onFocus={onFocus}
+          onClick={onClick}
+          style={{ fontSize: "21px" }}
         />
+
+        {showPopupModal && (
+          <PopupModal
+            properties={{
+              position,
+              onPopupClick: handlePopupClick,
+            }}
+            ref={ref}
+          />
+        )}
       </div>
-      {showPopupModal && (
-        <PopupModal position={position} onPopupClick={handlePopupClick} />
-      )}
-    </div>
-  );
-});
+    );
+  },
+);
 
 export default TextEditor;

@@ -3,9 +3,9 @@ import axios from "axios";
 export default async function deleteComment(styleId, articleId) {
   try {
     const response = await axios.delete(
-      `${import.meta.env.VITE_BASE_URL}/articles/review?articleId=${articleId}`,
+      `${import.meta.env.VITE_BASE_URL}/articles/${articleId}/review`,
       {
-        data: { styleId },
+        data: { articleId, styleId },
       },
     );
 
