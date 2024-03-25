@@ -21,18 +21,16 @@ export const ColorPicker = ({ fn }) => {
 
 export const FontDropDown = ({ fn }) => {
   return (
-    <div className="fixed mt-[100px] border rounded-md bg-white drop-shadow-md w-[120px]">
-      <div className="flex flex-col justify-center items-center w-[120px]">
-        {FONT_SIZES.map((el) => (
-          <div
-            className="hover:text-slate-900 hover:font-bold text-[15px] w-[120px]"
-            key={el}
-            onClick={() => fn(el)}
-          >
-            {el}
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-col justify-center items-center w-full">
+      {FONT_SIZES.map((el) => (
+        <div
+          className="hover:text-slate-900 hover:bg-gray-100 text-[15px] flex justify-center items-center w-full py-1"
+          key={el}
+          onClick={() => fn(el)}
+        >
+          {el}
+        </div>
+      ))}
     </div>
   );
 };
