@@ -5,10 +5,13 @@ export default async function saveComment(
   articleId,
   commentObj,
 ) {
-  await axios.post(`${import.meta.env.VITE_BASE_URL}/articles/review`, {
-    withCredentials: true,
-    articleContent,
-    articleId,
-    commentObj,
-  });
+  await axios.post(
+    `${import.meta.env.VITE_BASE_URL}/articles/${articleId}/review`,
+    {
+      withCredentials: true,
+      articleContent,
+      articleId,
+      commentObj,
+    },
+  );
 }
