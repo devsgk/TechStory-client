@@ -1,0 +1,42 @@
+.modal {
+  position: fixed;
+  top: 21%;
+  left: 50%;
+  width: 30%;
+  transform: translateX(-50%);
+  background-color: red;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  opacity: 0;
+  visibility: hidden;
+  text-align: center;
+}
+
+.animate-show {
+  animation: fadeInStayFadeOut 2.3s forwards;
+}
+
+.animate-hide {
+  visibility: hidden;
+  opacity: 0;
+}
+
+@keyframes fadeInStayFadeOut {
+  0% {
+    opacity: 0;
+    visibility: visible;
+  }
+  43% {
+    opacity: 0.5;
+    visibility: visible;
+  }
+  56% {
+    opacity: 0.5;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
