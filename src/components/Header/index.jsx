@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { signInWithPopup, signOut } from "firebase/auth";
 import axios from "axios";
+import { MdOutlineArticle } from "react-icons/md";
+import { IoLogOutOutline } from "react-icons/io5";
+
 import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../../config/firebase";
 import { useUserStore } from "../../store/store";
@@ -9,6 +12,7 @@ export default function Header() {
   const { user, setUser, isLoggedIn, setIsLoggedIn } = useUserStore();
   const [isUserNameClicked, setIsUserNameClicked] = useState(false);
   const userNameRef = useRef();
+  const headerRef = useRef();
   const navigate = useNavigate();
 
   async function logIn(user) {
@@ -105,6 +109,12 @@ export default function Header() {
   function handleLogoClick() {
     setIsUserNameClicked(false);
     navigate("/");
+
+    if (headerRef.current) {
+      const elementTopPosition = headerRef.current.getBoundingClientRect().top;
+
+      window.scrollTo({ top: elementTopPosition, behavior: "smooth" });
+    }
   }
 
   function handleMyArticlesClick() {
@@ -135,6 +145,7 @@ export default function Header() {
       className="flex items-center py-5 pl-7 bg-[#ffbf16]
     ] border-b-[1px] border-black sticky top-0 z-10"
       style={{ paddingLeft: "19%", paddingRight: "19%" }}
+      ref={headerRef}
     >
       <button
         className="font-bold text-[25px] cursor-pointer"
@@ -164,22 +175,18 @@ export default function Header() {
                     className="flex items-center hover:bg-slate-100 hover:rounded-md cursor-pointer"
                     onClick={handleMyArticlesClick}
                   >
-                    <img
-                      className="w-4 justify-center items-center m-3"
-                      src="/assets/articlesLogo.png"
-                      alt="articles logo"
-                    />
+                    <div className="justify-center items-center m-3">
+                      <MdOutlineArticle size={20} />
+                    </div>
                     <button className="mx-4">My articles</button>
                   </div>
                   <div
                     className="flex items-center hover:bg-slate-100 hover:rounded-md cursor-pointer"
                     onClick={handleLogOut}
                   >
-                    <img
-                      className="w-4 justify-center items-center  m-3"
-                      src="/assets/logOutLogo.png"
-                      alt="logOutLogo"
-                    />
+                    <div className="justify-center items-center m-3">
+                      <IoLogOutOutline size={23} />
+                    </div>
                     <button className="mx-4">Log Out</button>
                   </div>
                 </div>

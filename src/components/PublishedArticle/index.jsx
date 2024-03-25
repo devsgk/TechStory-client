@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
 import axios from "axios";
+import DOMPurify from "dompurify";
+
 import Title from "../Title";
 
 export default function PublishedArticle() {
@@ -9,8 +10,9 @@ export default function PublishedArticle() {
   const [photoURL, setPhotoURL] = useState("");
   const [authorDisplayName, setAuthorDisplayName] = useState("");
   const [articleContent, setArticleContent] = useState("");
-
+  const [readTime, setReadTime] = useState(0);
   const { articleId } = useParams();
+  const [createdAt, setCreatedAt] = useState("");
 
   useEffect(() => {
     async function getArticle() {
@@ -23,10 +25,14 @@ export default function PublishedArticle() {
       );
 
       if (response.data.result === "ok") {
+        setReadTime(
+          Math.max(parseInt(response.data.article.textContent.length / 250), 1),
+        );
         setTitle(response.data.article.title);
         setPhotoURL(response.data.article.author.photoURL);
         setAuthorDisplayName(response.data.article.author.displayName);
         setArticleContent(response.data.cleanedArticle);
+        setCreatedAt(response.data.article.createdAt);
       }
     }
 
@@ -43,8 +49,11 @@ export default function PublishedArticle() {
         />
         <div className="flex flex-col ml-2">
           <span>{authorDisplayName}</span>
-          <span className="text-[#717171]">5 min read</span>
+          <span className="text-[#717171]">{readTime} min read</span>
         </div>
+        <span className="ml-auto mt-auto text-[#717171]">
+          {createdAt.slice(0, 10)}
+        </span>
       </div>
       <Title
         title={title}
@@ -54,7 +63,9 @@ export default function PublishedArticle() {
       <div className="flex">
         <div
           className="w-full p-2"
-          dangerouslySetInnerHTML={{ __html: articleContent }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(articleContent),
+          }}
         />
       </div>
     </div>
