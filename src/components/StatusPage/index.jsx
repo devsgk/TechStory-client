@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { IoIosArrowBack } from "react-icons/io";
+
 import { useUserStore } from "../../store/store";
 import {
   checkLoggedInStatus,
@@ -50,14 +52,15 @@ export default function StatusPage() {
   }
 
   async function handleCancelPublish() {
-    window.alert("Are you sure you want to cancel publish?");
-    const response = await axios.delete(
-      `${import.meta.env.VITE_BASE_URL}/articles/${articleId}/publish`,
-      { withCredentials: true },
-    );
+    if (window.confirm("Are you sure you want to cancel publish?")) {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BASE_URL}/articles/${articleId}/publish`,
+        { withCredentials: true },
+      );
 
-    if (response.data.result === "ok") {
-      setIsPublished((prev) => !prev);
+      if (response.data.result === "ok") {
+        setIsPublished((prev) => !prev);
+      }
     }
   }
 
@@ -131,17 +134,20 @@ export default function StatusPage() {
   return (
     <>
       {identity !== "unAuthorized" && (
-        <div className="flex flex-col m-10 text-[14px]">
-          <h1
-            className="font-bold text-[20px] mb-5 cursor-pointer"
+        <div
+          className="flex flex-col text-[14px] mt-5"
+          style={{ paddingLeft: "19%", paddingRight: "19%" }}
+        >
+          <button
+            className="font-bold text-[15px] border mr-auto p-1 rounded-md mb-[50px] cursor-pointer hover:bg-gray-100"
             onClick={handleBackClick}
           >
-            Back
-          </h1>
+            <IoIosArrowBack />
+          </button>
           <h1 className="font-bold text-[20px]">Article Description</h1>
 
-          <div className="flex flex-col items-left my-3">
-            <span className="font-bold">Author</span>
+          <div className="flex flex-col items-left my-3 border rounded-md p-3">
+            <span className="font-bold mb-5">Author</span>
             <div className="flex my-2">
               <img
                 className="rounded-full w-5 mx-4"
@@ -152,8 +158,8 @@ export default function StatusPage() {
             </div>
           </div>
 
-          <div className="flex flex-col items-left my-3">
-            <span className="font-bold">Reviewers:</span>
+          <div className="flex flex-col items-left my-3 border rounded-md p-3">
+            <span className="font-bold mb-5">Reviewers</span>
             <div className="flex flex-col my-2">
               {reviewers.map((el) => (
                 <div className="flex mx-2 my-1" key={el.email}>
@@ -185,20 +191,32 @@ export default function StatusPage() {
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <span className="font-bold my-2">Published Status</span>
+          <div className="flex flex-col border my-3 rounded-md p-3">
+            <span className="font-bold my-2 mb-5">Published Status</span>
             {isPublished ? (
-              <div className="mx-2 text-green-600">Published</div>
+              <div className="flex mx-3">
+                <img
+                  className="w-5 h-5"
+                  src="/assets/published.png"
+                  alt="published icon"
+                />
+                <div className="mx-5 text-green-600 font-bold">Published</div>
+              </div>
             ) : (
-              <div className="mx-2 ml-4 text-gray-600">
-                {isPublished ? "Pulished" : "Draft"}
+              <div className="flex mx-3">
+                <img
+                  className="w-5 h-5"
+                  src="/assets/draft.png"
+                  alt="draft icon"
+                />
+                <div className="mx-5 text-red-600 font-bold">Draft</div>
               </div>
             )}
           </div>
 
           {reviewList.length > 0 && (
-            <div className="mt-10 font-bold text-[18px]">
-              Comments
+            <div className="flex flex-col border my-3 rounded-md p-3">
+              <span className="font-bold my-2 mb-5">Comments</span>
               {reviewList.map((el, index) => (
                 <p key={index} className="text-[14px] font-normal">
                   : {el.comment} ({el.creator.displayName})
@@ -210,9 +228,9 @@ export default function StatusPage() {
           {user.email === author && (
             <>
               {!isPublished && (
-                <>
+                <div className="border p-3 rounded-md my-3 mb-10">
                   <div
-                    className={`mt-10 mb-3 text-[15px] font-bold ${
+                    className={`mb-3 text-[15px] font-bold ${
                       canPublish ? "text-green-600" : "text-red-600"
                     }`}
                   >
@@ -223,7 +241,7 @@ export default function StatusPage() {
                     className={`border p-1 rounded-md w-[150px] text-[15px] text-white font-bold ${
                       canPublish ? "cursor-pointer" : ""
                     }
-                ${canPublish ? "bg-green-600" : "bg-red-500"}
+                ${canPublish ? "bg-green-600" : "bg-gray-400"}
                 `}
                     disabled={canPublish ? false : true}
                     onClick={handlePublish}
@@ -232,26 +250,26 @@ export default function StatusPage() {
                   >
                     {canPublish ? "Publish" : "Cannot publish"}
                   </button>
-                </>
+                </div>
               )}
 
               {isPublished && (
-                <>
+                <div className="border p-3 border-red-500 rounded-md my-3 mb-10">
                   <div
-                    className="mt-10 mb-3 text-[15px] font-bold
-                      text-green-600"
+                    className="mb-3 text-[15px] font-bold
+                      text-red-500 b"
                   >
-                    Undo publish?
+                    Cancel publishing...?
                   </div>
 
                   <button
-                    className="border p-1 rounded-md w-[150px] text-[15px] text-white font-bold cursor-pointer bg-green-600"
+                    className="border p-1 rounded-md w-[150px] text-[15px] text-white font-bold cursor-pointer bg-red-500"
                     onClick={handleCancelPublish}
                     type="button"
                   >
-                    Undo publish
+                    Cancel
                   </button>
-                </>
+                </div>
               )}
             </>
           )}
@@ -259,9 +277,9 @@ export default function StatusPage() {
           {reviewers.some((el) => el.email === user.email) && (
             <>
               {!isPublished && (
-                <>
+                <div className="border py-3 rounded-md my-3 mb-10">
                   <div
-                    className={`mt-10 mb-3 text-[15px] font-bold ${
+                    className={`mx-3 mb-3 text-[15px] font-bold ${
                       hasApproved ? "text-green-600" : "text-red-600"
                     }`}
                   >
@@ -270,7 +288,7 @@ export default function StatusPage() {
                       : "Approve your review"}
                   </div>
                   <button
-                    className={`border p-1 rounded-md w-[150px] text-[15px] text-white font-bold ${
+                    className={`border p-1 my-3 mx-3 rounded-md w-[150px] text-[15px] text-white font-bold ${
                       hasApproved
                         ? "bg-green-600 "
                         : "bg-red-500 hover:bg-green-600"
@@ -281,7 +299,7 @@ export default function StatusPage() {
                   >
                     {hasApproved ? "Already approved" : "Approve"}
                   </button>
-                </>
+                </div>
               )}
             </>
           )}
