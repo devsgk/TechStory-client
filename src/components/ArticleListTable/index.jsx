@@ -13,23 +13,20 @@ export default function ArticleListTable({ type, list }) {
       <h1 className="text-left font-bold text-[15px] my-5 border w-fit px-2 py-1 bg-green-700 rounded-md text-white">
         {type}
       </h1>
-      <div className="overflow-hidden rounded-lg border p-5">
+      <div className="overflow-hidden rounded-lg border p-1">
         <table className="text-center w-full border-collapse">
           <thead>
             <tr>
-              <th scope="col" className="w-1/12 ">
-                Number
-              </th>
               <th scope="col" className="w-2/12">
                 Title
               </th>
-              <th scope="col" className="w-5/12">
+              <th scope="col" className="w-4/12">
                 Preview
               </th>
-              <th scope="col" className="w-3/12">
+              <th scope="col" className="w-4/12">
                 Reviewers
               </th>
-              <th scope="col" className="w-1/12">
+              <th scope="col" className="w-2/12">
                 Status
               </th>
             </tr>
@@ -44,9 +41,8 @@ export default function ArticleListTable({ type, list }) {
                   id={el._id}
                   onClick={handleArticleListClick}
                 >
-                  <td className="rounded-bl-lg rounded-tl-lg">{index + 1}</td>
                   <td>{el.title}</td>
-                  <td>{el.textContent.slice(0, 100)}...</td>
+                  <td>{el.textContent.slice(0, 15)}...</td>
                   <td>
                     {el.reviewers.length === 0
                       ? "None"
@@ -57,7 +53,7 @@ export default function ArticleListTable({ type, list }) {
                           >
                             <p className="mb-0">{reviewer.email}</p>
                             <img
-                              className="w-4 h-4"
+                              className="w-3 h-3"
                               src={
                                 reviewer.status === "approved"
                                   ? "/assets/resolveIcon1.png"
