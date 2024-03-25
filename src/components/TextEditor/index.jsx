@@ -1,100 +1,71 @@
-import { forwardRef, useState } from "react";
-import {
-  FiItalic,
-  FiBold,
-  FiUnderline,
-  FiAlignCenter,
-  FiAlignLeft,
-  FiAlignRight,
-  FiList,
-} from "react-icons/fi";
-import { BiFontSize } from "react-icons/bi";
-import { AiOutlineOrderedList } from "react-icons/ai";
-import { RiMarkPenLine } from "react-icons/ri";
-import { CgColorBucket } from "react-icons/cg";
+import { forwardRef, useEffect, useState } from "react";
 
+import PopupModal from "../PopupModal";
+
+import { createPopupModal } from "../../utils/commentPopup";
 import TextEditorCommands from "../../utils/TextEditorCommands";
-import { ColorPicker, FontDropDown } from "../TextEditorUtilsComponent";
+
 import "./style.css";
 
-const TextEditor = forwardRef((props, ref) => {
-  const [isPaintingBackground, setIsPaintingBackground] = useState(false);
-  const [isPaintingText, setIsPaintingText] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+const TextEditor = forwardRef(
+  ({ properties, onFocus, onKeyUp, onClick }, ref) => {
+    const [position, setPosition] = useState(null);
+    const [showPopupModal, setShowPopupModal] = useState(false);
+    const { enableResize = false } = properties;
 
-  const { enableResize = false } = props.properties;
-  const commands = new TextEditorCommands();
+    function handleMouseUp() {
+      const selection = window.getSelection();
+      const originalRange = selection.getRangeAt(0);
 
-  return (
-    <div
-      className={`TextEditor flex flex-col w-full h-[500px] overflow-hidden ${enableResize ? "resize-y" : "resize-none"}`}
-    >
-      <div className="Buttons">
-        <button onClick={() => commands.bold()}>
-          <FiBold />
-        </button>
-        <button onClick={() => commands.italic()}>
-          <FiItalic />
-        </button>
-        <button onClick={() => commands.underline()}>
-          <FiUnderline />
-        </button>
-        <button onClick={() => commands.alignLeft()}>
-          <FiAlignLeft />
-        </button>
-        <button onClick={() => commands.alignCenter()}>
-          <FiAlignCenter />
-        </button>
-        <button onClick={() => commands.alignRight()}>
-          <FiAlignRight />
-        </button>
+      if (originalRange.collapsed) {
+        setShowPopupModal(false);
 
-        <button onClick={() => commands.orderedList()}>
-          <AiOutlineOrderedList />
-        </button>
-        <button onClick={() => commands.unorderedList()}>
-          <FiList />
-        </button>
-        <button onClick={() => setIsPaintingBackground((prev) => !prev)}>
-          <CgColorBucket className="border-b-[3px] h-7 border-b-red-500" />
-        </button>
-        <button onClick={() => setIsPaintingText((prev) => !prev)}>
-          <RiMarkPenLine className="border-b-[3px] h-7 border-b-red-500" />
-        </button>
-        <button
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <BiFontSize />
-          {isHovered && <FontDropDown fn={(n) => commands.fontSize(n)} />}
-        </button>
-      </div>
+        return;
+      }
 
-      {isPaintingBackground && (
-        <div className="absolute left-1/2 ml-[100px] mt-[-80px] z-10">
-          <ColorPicker fn={(s) => commands.bgColor(s)} />
-        </div>
-      )}
-      {isPaintingText && (
-        <div className="absolute left-1/2 ml-[130px] mt-[-80px] z-10">
-          <ColorPicker
-            state={setIsPaintingText}
-            fn={(s) => commands.color(s)}
-          />
-        </div>
-      )}
-      <div
-        className={`TextareaWrapper w-full h-screen overflow-y-auto ${enableResize ? "resize-y" : "resize-none"}`}
-      >
+      createPopupModal(
+        selection,
+        originalRange,
+        setPosition,
+        setShowPopupModal,
+      );
+    }
+
+    function handlePopupClick() {
+      console.log("popup clicked");
+    }
+
+    return (
+      <div className={`flex flex-col w-full overflow-y-auto mb-10`}>
+        {ref.current?.innerHTML === "" && (
+          <span className="absolute pl-9 text-gray-300 z-[-10] text-[21px]">
+            Tell me your story...
+          </span>
+        )}
         <div
-          className="w-full outline-none p-2 pr-0 break-all h-full min-h-screen overflow-y-auto"
+          className="w-full outline-none pr-0 break-after-all"
           ref={ref}
           contentEditable
+          onMouseUp={handleMouseUp}
           spellCheck="false"
+          onKeyUp={onKeyUp}
+          onFocus={onFocus}
+          onClick={onClick}
+          style={{ fontSize: "21px" }}
         />
+
+        {showPopupModal && (
+          <PopupModal
+            properties={{
+              position,
+              onPopupClick: handlePopupClick,
+            }}
+            ref={ref}
+          />
+        )}
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 export default TextEditor;
