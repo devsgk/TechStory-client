@@ -9,22 +9,16 @@ import {
   FiItalic,
   FiUnderline,
 } from "react-icons/fi";
-import { FaImage } from "react-icons/fa";
 
 import { RiMarkPenLine } from "react-icons/ri";
 import { ColorPicker, FontDropDown } from "../TextEditorUtilsComponent";
 import TextEditorCommands from "../../utils/TextEditorCommands";
-import {
-  handleFileUpload,
-  handleStyleButtonClick,
-} from "../../utils/styleText";
+import { handleStyleButtonClick } from "../../utils/styleText";
 
 const TextEditorTools = forwardRef((props, ref) => {
   const [isPaintingBackground, setIsPaintingBackground] = useState(false);
   const [isPaintingText, setIsPaintingText] = useState(false);
   const [isChangingFontSize, setIsChangingFonstSize] = useState(false);
-
-  const fileInputRef = useRef();
 
   const commands = new TextEditorCommands();
 
@@ -102,37 +96,12 @@ const TextEditorTools = forwardRef((props, ref) => {
           <BiFontSize />
           {isChangingFontSize && (
             <div className="absolute mt-[-120px] ml-[-15px] shadow-md rounded-md bg-white w-[50px]">
-              <FontDropDown fn={(n) => commands.fontSize(n)} />
+              <FontDropDown
+                fn={(size) => handleStyleButtonClick("fontSize", size)}
+              />
             </div>
           )}
         </button>
-
-        <div
-          className="flex"
-          onClick={(e) => {
-            e.stopPropagation();
-
-            fileInputRef.current.click();
-          }}
-        >
-          <button>
-            <label
-              className="rounded-md text-center m-auto cursor-pointer"
-              htmlFor="files"
-            >
-              <FaImage />
-            </label>
-            <input
-              ref={fileInputRef}
-              id="files"
-              className="hidden"
-              type="file"
-              onChange={(e) => {
-                handleFileUpload(e, ref);
-              }}
-            />
-          </button>
-        </div>
       </div>
     </>
   );

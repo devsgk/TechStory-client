@@ -9,4 +9,5 @@ export const COLORS = [
   "black",
   "white",
 ];
-export const FONT_SIZES = ["S", "M", "L", "XL"];
+
+export const FONT_SIZES = [14, 20, 25, 30, 40, 50, 60, 70];

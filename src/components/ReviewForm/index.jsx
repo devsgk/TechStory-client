@@ -16,6 +16,7 @@ export default function ReviewForm({ onReviewFormSave, onReviewFormCancel }) {
           rows="2"
           autoFocus
           placeholder="Add a comment..."
+          spellCheck="false"
         />
         <div className="flex space-x-2 mr-auto">
           <button

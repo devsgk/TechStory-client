@@ -77,21 +77,25 @@ export default function Header() {
   }
 
   async function checkLogIn() {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}/auth/check`,
-      {
-        withCredentials: true,
-      },
-    );
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/auth/check`,
+        {
+          withCredentials: true,
+        },
+      );
 
-    if (response.data.result) {
-      setIsLoggedIn(true);
-      setUser(response.data.user);
+      if (response.data.result) {
+        setIsLoggedIn(true);
+        setUser(response.data.user);
+      }
+
+      setIsUserNameClicked(false);
+
+      return response.data.result;
+    } catch (error) {
+      console.log(error);
     }
-
-    setIsUserNameClicked(false);
-
-    return response.data.result;
   }
 
   async function handleWriteClick() {

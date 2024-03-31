@@ -42,7 +42,7 @@ export default function MainPage() {
         </button>
       </div>
       <div
-        className="mt-[100px]"
+        className="mt-[100px] mb-[150px]"
         ref={mainRef}
         style={{ paddingLeft: "19%", paddingRight: "19%" }}
       >
