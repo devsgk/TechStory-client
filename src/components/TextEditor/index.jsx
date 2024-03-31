@@ -1,71 +1,57 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useState } from "react";
 
 import PopupModal from "../PopupModal";
 
 import { createPopupModal } from "../../utils/commentPopup";
-import TextEditorCommands from "../../utils/TextEditorCommands";
 
 import "./style.css";
 
-const TextEditor = forwardRef(
-  ({ properties, onFocus, onKeyUp, onClick }, ref) => {
-    const [position, setPosition] = useState(null);
-    const [showPopupModal, setShowPopupModal] = useState(false);
-    const { enableResize = false } = properties;
+const TextEditor = forwardRef(({ onFocus, onKeyUp, onClick }, ref) => {
+  const [position, setPosition] = useState(null);
+  const [showPopupModal, setShowPopupModal] = useState(false);
 
-    function handleMouseUp() {
-      const selection = window.getSelection();
-      const originalRange = selection.getRangeAt(0);
+  function handleMouseUp() {
+    const selection = window.getSelection();
+    const originalRange = selection.getRangeAt(0);
 
-      if (originalRange.collapsed) {
-        setShowPopupModal(false);
+    if (originalRange.collapsed) {
+      setShowPopupModal(false);
 
-        return;
-      }
-
-      createPopupModal(
-        selection,
-        originalRange,
-        setPosition,
-        setShowPopupModal,
-      );
+      return;
     }
 
-    function handlePopupClick() {
-      console.log("popup clicked");
-    }
+    createPopupModal(selection, originalRange, setPosition, setShowPopupModal);
+  }
 
-    return (
-      <div className={`flex flex-col w-full overflow-y-auto mb-10`}>
-        {ref.current?.innerHTML === "" && (
-          <span className="absolute pl-9 text-gray-300 z-[-10] text-[21px]">
-            Tell me your story...
-          </span>
-        )}
-        <div
-          className="w-full outline-none pr-0 break-after-all"
+  return (
+    <div className={`flex flex-col w-full overflow-y-auto mb-10`}>
+      {ref.current?.innerHTML === "" && (
+        <span className="absolute pl-9 text-gray-300 z-[-10] text-[21px]">
+          Tell me your story...
+        </span>
+      )}
+      <div
+        className="w-full outline-none pr-0 break-after-all"
+        ref={ref}
+        contentEditable
+        onMouseUp={handleMouseUp}
+        spellCheck="false"
+        onKeyUp={onKeyUp}
+        onFocus={onFocus}
+        onClick={onClick}
+        style={{ fontSize: "21px" }}
+      />
+
+      {showPopupModal && (
+        <PopupModal
+          properties={{
+            position,
+          }}
           ref={ref}
-          contentEditable
-          onMouseUp={handleMouseUp}
-          spellCheck="false"
-          onKeyUp={onKeyUp}
-          onFocus={onFocus}
-          onClick={onClick}
-          style={{ fontSize: "21px" }}
         />
-
-        {showPopupModal && (
-          <PopupModal
-            properties={{
-              position,
-              onPopupClick: handlePopupClick,
-            }}
-            ref={ref}
-          />
-        )}
-      </div>
-    );
-  },
-);
+      )}
+    </div>
+  );
+});
 
 export default TextEditor;

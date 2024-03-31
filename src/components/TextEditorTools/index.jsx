@@ -29,27 +29,28 @@ const TextEditorTools = forwardRef((props, ref) => {
           onClick={() => {
             commands.bold();
           }}
+          aria-label="Bold"
         >
           <FiBold />
         </button>
 
-        <button onClick={() => commands.italic()}>
+        <button onClick={() => commands.italic()} aria-label="Italic">
           <FiItalic />
         </button>
 
-        <button onClick={() => commands.underline()}>
+        <button onClick={() => commands.underline()} aria-label="Underline">
           <FiUnderline />
         </button>
 
-        <button onClick={() => commands.alignLeft()}>
+        <button onClick={() => commands.alignLeft()} aria-label="AlignLeft">
           <FiAlignLeft />
         </button>
 
-        <button onClick={() => commands.alignCenter()}>
+        <button onClick={() => commands.alignCenter()} aria-label="AlignCenter">
           <FiAlignCenter />
         </button>
 
-        <button onClick={() => commands.alignRight()}>
+        <button onClick={() => commands.alignRight()} aria-label="AlignRight">
           <FiAlignRight />
         </button>
 
@@ -59,11 +60,15 @@ const TextEditorTools = forwardRef((props, ref) => {
             setIsPaintingText(false);
             setIsChangingFonstSize(false);
           }}
+          aria-label="PaintBackground"
         >
           <CgColorBucket className="border-b-[3px] h-7 border-b-red-500" />
           {isPaintingBackground && (
             <div className="absolute left-1/2 ml-[-14px] mt-[-115px] z-10">
-              <ColorPicker fn={(s) => commands.bgColor(s)} />
+              <ColorPicker
+                fn={(s) => commands.bgColor(s)}
+                aria-label="ColorPicker"
+              />
             </div>
           )}
         </button>
@@ -74,6 +79,7 @@ const TextEditorTools = forwardRef((props, ref) => {
             setIsPaintingBackground(false);
             setIsChangingFonstSize(false);
           }}
+          aria-label="PaintText"
         >
           <RiMarkPenLine className="border-b-[3px] h-7 border-b-red-500" />
           {isPaintingText && (
@@ -92,6 +98,7 @@ const TextEditorTools = forwardRef((props, ref) => {
             setIsPaintingText(false);
             setIsPaintingBackground(false);
           }}
+          aria-label="FontSize"
         >
           <BiFontSize />
           {isChangingFontSize && (
