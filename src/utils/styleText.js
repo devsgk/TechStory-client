@@ -222,7 +222,6 @@ export function getSelectedNode() {
 }
 
 export function applyTextEffect(range, effectTag) {
-  console.log("APPLY");
   const selectionContents = range.extractContents();
   const wrapper = document.createElement(effectTag);
 
@@ -294,12 +293,10 @@ export function removeTextEffect(selectedNode, effectTag) {
       node.nodeType === Node.ELEMENT_NODE &&
       node.nodeName.toLowerCase() === effectTag
     ) {
-      console.log("1", node.childNodes);
       Array.from(node.childNodes).forEach((child) => {
         preserveStylesAndRemoveEffect(child, parent);
       });
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-      console.log("2");
       const clone = document.createElement(node.tagName);
 
       Array.from(node.attributes).forEach((attr) => {
@@ -317,9 +314,6 @@ export function removeTextEffect(selectedNode, effectTag) {
       }
 
       last = node;
-
-      console.log("3");
-
       parent.appendChild(node.cloneNode());
     }
   };

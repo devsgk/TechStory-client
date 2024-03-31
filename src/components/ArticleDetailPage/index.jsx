@@ -3,8 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import DOMPurify from "dompurify";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import { useUserStore, useReviewListStore } from "../../store/store";
+
 import TextEditor from "../TextEditor";
 import ReviewFormContainer from "../ReviewFormContainer";
 import ReviewForm from "../ReviewForm";
@@ -12,6 +14,10 @@ import ReviewModal from "../ReviewModal";
 import AuthorActionsForm from "../AuthorActionsForm";
 import Title from "../Title";
 import CommentPopup from "../CommentPopup";
+import CircleIcon from "../CircleIcon";
+import SavedModal from "../SavedModal";
+import ModifyingModal from "../ModifyingModal";
+import TitleInput from "../TitleInput";
 
 import { addIndent, correctTags } from "../../utils/cleanContent";
 import { handleLogIn } from "../../utils/handleLogin";
@@ -23,15 +29,10 @@ import { createPopupModal, styleSelectedArea } from "../../utils/commentPopup";
 import getArticle from "../../utils/getArticle";
 import saveComment from "../../utils/saveComment";
 import deleteComment from "../../utils/deleteComment";
-import "../styles.css";
 import validateReviewerEmail from "../../utils/validateReviewerEmail";
 import deleteArticle from "../../utils/deleteArticle";
-import { CiCirclePlus } from "react-icons/ci";
-import { FaImage } from "react-icons/fa";
-import { handleFileUpload } from "../../utils/styleText";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import SavedModal from "../SavedModal";
-import ModifyingModal from "../ModifyingModal";
+
+import "../styles.css";
 
 export default function ArticleDetailPage() {
   const { user, identity, setIsLoggedIn, setUser, setIdentity } =
@@ -287,13 +288,6 @@ export default function ArticleDetailPage() {
     navigate(`/articles/${articleId}/status`);
   }
 
-  function handleEmailRemoveClick(e) {
-    const removedEmail = e.target.textContent;
-    const newReviewersList = reviewersList.filter((el) => el !== removedEmail);
-
-    setReviewersList(newReviewersList);
-  }
-
   useEffect(() => {
     async function identifyUser(articleId) {
       const userData = await checkLoggedInStatus(articleId);
@@ -473,12 +467,11 @@ export default function ArticleDetailPage() {
 
           {isEditing ? (
             <>
-              <input
-                className={`text-5xl outline-none ${title.trim().length === 0 && showTitleError ? "border-red-500 border-2 rounded-md" : ""} w-full mb-5`}
-                placeholder="  Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                ref={titleInputRef}
+              <TitleInput
+                title={title}
+                showTitleError={showTitleError}
+                onInputChange={setTitle}
+                titleInputRef={titleInputRef}
                 onFocus={handleEditorEvents}
                 onKeyUp={handleEditorEvents}
                 onClick={() => {
@@ -486,7 +479,6 @@ export default function ArticleDetailPage() {
                   setIsCircleClicked(false);
                 }}
                 onKeyDown={handleKeyDown}
-                spellCheck="false"
               />
               <TextEditor
                 ref={editorRef}
@@ -503,48 +495,11 @@ export default function ArticleDetailPage() {
                   setIsCircleClicked(false);
                 }}
               />
-              <div className="flex">
-                <div
-                  className="absolute mt-[-13px]"
-                  style={{
-                    left: iconPosition.x - 40,
-                    top: iconPosition.y,
-                  }}
-                >
-                  <CiCirclePlus
-                    className="cursor-pointer transition-transform duration-300 ease-in-out"
-                    style={{
-                      transform: `rotate(${isCircleClicked ? 45 : 0}deg)`,
-                    }}
-                    size={30}
-                    onClick={handleCircleClick}
-                  />
-                </div>
-                {isCircleClicked && (
-                  <div
-                    className="absolute hover:bg-gray-200 rounded-md p-1 h-[30px] items-center justify-center"
-                    style={{
-                      left: iconPosition.x - 32,
-                      top: iconPosition.y + 30,
-                    }}
-                  >
-                    <button>
-                      <label
-                        className="rounded-md text-center m-auto cursor-pointer"
-                        htmlFor="files"
-                      >
-                        <FaImage size={25} />
-                      </label>
-                      <input
-                        id="files"
-                        className="hidden"
-                        type="file"
-                        onChange={(e) => handleFileUpload(e, editorRef)}
-                      />
-                    </button>
-                  </div>
-                )}
-              </div>
+              <CircleIcon
+                iconPosition={iconPosition}
+                isCircleClicked={isCircleClicked}
+                onClick={handleCircleClick}
+              />
             </>
           ) : (
             <>

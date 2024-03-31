@@ -5,7 +5,7 @@ export const ColorPicker = ({ fn }) => {
     <div className="w-44 h-fit border border-slate-300 bg-white rounded-md flex flex-col justify-between shadow-md shadow-slate-200">
       <div className="grid grid-cols-3 w-full h-20 list-none p-0">
         {COLORS.map((el) => (
-          <button
+          <div
             className="w-6 h-6 border rounded-full place-self-center border-neutral-800"
             style={{ background: el }}
             key={el}

@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
 
-import TextEditor from "../TextEditor";
 import { useUserStore } from "../../store/store";
+
+import TitleInput from "../TitleInput";
+import CircleIcon from "../CircleIcon";
+import TextEditor from "../TextEditor";
+
 import { addIndent, correctTags } from "../../utils/cleanContent";
-import { CiCirclePlus } from "react-icons/ci";
-import { FaImage } from "react-icons/fa";
-import { handleFileUpload } from "../../utils/styleText";
 
 export default function NewArticle() {
   const { user } = useUserStore();
@@ -163,12 +164,11 @@ export default function NewArticle() {
             >
               Save
             </button>
-            <input
-              className={`text-5xl outline-none ${title.trim().length === 0 && showTitleError ? "border-red-500 border-2 rounded-md" : ""} w-full mb-5`}
-              placeholder="   Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              ref={titleInputRef}
+            <TitleInput
+              title={title}
+              showTitleError={showTitleError}
+              onInputChange={setTitle}
+              titleInputRef={titleInputRef}
               onFocus={handleEditorEvents}
               onKeyUp={handleEditorEvents}
               onClick={() => {
@@ -176,7 +176,6 @@ export default function NewArticle() {
                 setIsCircleClicked(false);
               }}
               onKeyDown={handleKeyDown}
-              spellCheck="false"
             />
             <TextEditor
               ref={textEditorRef}
@@ -194,48 +193,11 @@ export default function NewArticle() {
               }}
             />
 
-            <div className="flex">
-              <div
-                className="absolute mt-[-13px]"
-                style={{
-                  left: iconPosition.x - 35,
-                  top: iconPosition.y,
-                }}
-              >
-                <CiCirclePlus
-                  className="cursor-pointer transition-transform duration-300 ease-in-out"
-                  style={{
-                    transform: `rotate(${isCircleClicked ? 45 : 0}deg)`,
-                  }}
-                  size={30}
-                  onClick={handleCircleClick}
-                />
-              </div>
-              {isCircleClicked && (
-                <div
-                  className="absolute hover:bg-gray-200 rounded-md p-1 h-[30px] items-center justify-center"
-                  style={{
-                    left: iconPosition.x - 36,
-                    top: iconPosition.y + 20,
-                  }}
-                >
-                  <button>
-                    <label
-                      className="rounded-md text-center m-auto cursor-pointer"
-                      htmlFor="files"
-                    >
-                      <FaImage size={25} />
-                    </label>
-                    <input
-                      id="files"
-                      className="hidden"
-                      type="file"
-                      onChange={(e) => handleFileUpload(e, textEditorRef)}
-                    />
-                  </button>
-                </div>
-              )}
-            </div>
+            <CircleIcon
+              iconPosition={iconPosition}
+              isCircleClicked={isCircleClicked}
+              onClick={handleCircleClick}
+            />
           </>
         ) : (
           <>
