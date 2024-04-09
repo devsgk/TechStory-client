@@ -12,6 +12,7 @@ export const ColorPicker = ({ fn }) => {
             onClick={() => {
               fn(el);
             }}
+            data-testId={`color-${el}`}
           />
         ))}
       </div>
