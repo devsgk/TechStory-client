@@ -10,11 +10,13 @@
     "preview": "vite preview",
     "prepare": "husky install",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "proxy": "http://Soloproject-env.ap-northeast-2.elasticbeanstalk.com/",
   "homepage": "http://Soloproject-env.ap-northeast-2.elasticbeanstalk.com/",
   "dependencies": {
+    "@vitest/coverage-v8": "^1.4.0",
     "axios": "^1.6.7",
     "dompurify": "^3.0.11",
     "firebase": "^10.8.1",
