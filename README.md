@@ -162,6 +162,8 @@ This project was a true journey from start to finish. Starting with brainstormin
 
 This entire experience was eye-opening. It pushed me to stretch my boundaries, honed my skills, and ignited an even deeper passion for web development. More than just a project, it was a comprehensive lesson in perseverance, innovation, and the joy of seeing your vision come to life.
 
+<br>
+
 ## ⏰ Project timeline
 **2024.03.04 - 2024.03.10**
 
