@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import ErrorPage from "../components/ErrorPage";
 
-describe.skip("ErrorPage Component", () => {
+describe("ErrorPage Component", () => {
   const testErrorMessage = "Test Error Message";
 
   it("Should display the passed error message", () => {

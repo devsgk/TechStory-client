@@ -20,7 +20,7 @@ const mockUserState = {
   setIdentity: vi.fn(),
 };
 
-describe.skip("StatusPage Component", () => {
+describe("StatusPage Component", () => {
   beforeEach(() => {
     axios.get.mockClear();
     axios.post.mockClear();

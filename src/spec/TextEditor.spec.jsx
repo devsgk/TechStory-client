@@ -21,7 +21,7 @@ vi.mock("../components/TextEditorTools", () => {
   };
 });
 
-describe.skip("TextEditor component", () => {
+describe("TextEditor component", () => {
   it("Should render placeholder when ref's current innerHTML is empty", () => {
     const mockRef = {
       current: {

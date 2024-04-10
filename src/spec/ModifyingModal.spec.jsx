@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import ModifyingModal from "../components/ModifyingModal";
 
-describe.skip("ModifyingModal", () => {
+describe("ModifyingModal", () => {
   it("renders correctly when isOpen is true", () => {
     render(<ModifyingModal isOpen={true} />);
     const modalElement = screen.getByText(/start editing your article/i);

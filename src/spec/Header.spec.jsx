@@ -26,7 +26,7 @@ vi.mock("../store/store", () => ({
   })),
 }));
 
-describe.skip("header component", () => {
+describe("header component", () => {
   beforeEach(() => {
     render(
       <Router>
