@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Title from "../components/Title";
 
-describe.skip("Title Component", () => {
+describe("Title Component", () => {
   const mockOnTitleChange = vi.fn();
 
   it("Should render with initial title and without error", () => {

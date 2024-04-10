@@ -23,7 +23,7 @@ vi.mock("../utils/TextEditorCommands", () => {
   };
 });
 
-describe.skip("TextEditorTools component", () => {
+describe("TextEditorTools component", () => {
   let user;
 
   beforeEach(() => {

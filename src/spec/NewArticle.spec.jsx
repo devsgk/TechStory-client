@@ -40,7 +40,7 @@ vi.mock("../store/store", () => ({
   })),
 }));
 
-describe.skip("NewArticle component", () => {
+describe("NewArticle component", () => {
   beforeEach(() => {
     render(
       <Router>

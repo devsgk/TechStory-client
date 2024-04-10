@@ -7,7 +7,7 @@ import {
 } from "../components/TextEditorUtilsComponent";
 import { FONT_SIZES, COLORS } from "../constants/textEditorConstants";
 
-describe.skip("FontDropDown Component", () => {
+describe("FontDropDown Component", () => {
   it("Should render all font size options", () => {
     render(<FontDropDown fn={vi.fn()} />);
 

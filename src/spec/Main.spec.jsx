@@ -10,7 +10,7 @@ vi.mock("react-router-dom", () => ({
   BrowserRouter: ({ children }) => <div>{children}</div>,
 }));
 
-describe.skip("MainPage", () => {
+describe("MainPage", () => {
   beforeEach(() => {
     mockedNavigate.mockClear();
   });

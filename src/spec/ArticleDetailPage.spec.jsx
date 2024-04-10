@@ -30,7 +30,7 @@ vi.mock("react-router-dom", () => ({
   }),
 }));
 
-describe.skip("ArticleDetailPage", () => {
+describe("ArticleDetailPage", () => {
   beforeEach(() => {
     axios.get.mockResolvedValue({
       data: {
