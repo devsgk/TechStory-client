@@ -75,4 +75,39 @@ describe("NewArticle component", () => {
       );
     });
   });
+
+  it("Updates title state correctly upon user input", async () => {
+    const user = userEvent.setup();
+    const titleInput = screen.getByPlaceholderText("Title");
+    await user.type(titleInput, "New Article Title");
+
+    expect(titleInput.value).toBe("New Article Title");
+  });
+
+  it("validates title input and shows error on empty title save attempt", async () => {
+    const saveButton = screen.getByText("Save");
+    await userEvent.click(saveButton);
+
+    const titleInput = screen.getByPlaceholderText("Title");
+    expect(titleInput).toHaveClass("border-red-500");
+    expect(mockedNavigate).toHaveBeenCalled();
+  });
+
+  it("navigates to the article page on successful save", async () => {
+    axios.post.mockResolvedValueOnce({
+      data: { result: "ok", articleId: "unique-article-id" },
+    });
+
+    const titleInput = screen.getByPlaceholderText("Title");
+    await userEvent.type(titleInput, "Test Title");
+    await userEvent.click(screen.getByText("Save"));
+
+    expect(axios.post).toHaveBeenCalled();
+    expect(mockedNavigate).toHaveBeenCalledWith("/articles/unique-article-id");
+  });
+
+  it("focuses on the title input on component mount", () => {
+    const titleInput = screen.getByPlaceholderText("Title");
+    expect(document.activeElement).toEqual(titleInput);
+  });
 });
