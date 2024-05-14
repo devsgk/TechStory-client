@@ -16,6 +16,8 @@
   "proxy": "http://Soloproject-env.ap-northeast-2.elasticbeanstalk.com/",
   "homepage": "http://Soloproject-env.ap-northeast-2.elasticbeanstalk.com/",
   "dependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.11",
     "@vitest/coverage-v8": "^1.4.0",
     "axios": "^1.6.7",
     "dompurify": "^3.0.11",
@@ -25,6 +27,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
     "react-router-dom": "^6.22.3",
+    "typescript": "^5.4.5",
     "uuid": "^9.0.1",
     "zustand": "^4.5.2"
   },
@@ -32,8 +35,8 @@
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.2",
     "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^18.2.64",
-    "@types/react-dom": "^18.2.21",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.18",
     "eslint": "^8.57.0",
