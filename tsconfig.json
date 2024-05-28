@@ -18,5 +18,5 @@
     "incremental": true,
     "baseUrl": "src"
   },
-  "include": ["src"]
+  "include": ["src", "env.d.ts"]
 }

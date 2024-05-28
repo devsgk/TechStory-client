@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { signInWithPopup, signOut } from "firebase/auth";
+import { useEffect, useRef, useState } from "react";
+import { signInWithPopup, signOut, User } from "firebase/auth";
 import axios from "axios";
 import { MdOutlineArticle } from "react-icons/md";
 import { IoLogOutOutline } from "react-icons/io5";
@@ -11,11 +11,11 @@ import { useUserStore } from "../../store/store";
 export default function Header() {
   const { user, setUser, isLoggedIn, setIsLoggedIn } = useUserStore();
   const [isUserNameClicked, setIsUserNameClicked] = useState(false);
-  const userNameRef = useRef();
-  const headerRef = useRef();
+  const userNameRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  async function logIn(user) {
+  async function logIn(user: User) {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/auth/logIn`,
@@ -131,8 +131,11 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (userNameRef.current && !userNameRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        userNameRef.current &&
+        !userNameRef.current.contains(event.target as Node)
+      ) {
         setIsUserNameClicked(false);
       }
     }

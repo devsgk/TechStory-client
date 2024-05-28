@@ -8,12 +8,12 @@ import StatusPage from "../StatusPage";
 import ArticleListPage from "../ArticleListPage";
 import PublishedArticle from "../PublishedArticle";
 
-function App() {
+const App: React.FC = () => {
   return (
     <>
       <Header />
       <Routes>
-        <Route path="/" exact element={<MainPage />} />
+        <Route path="/" element={<MainPage />} />
         <Route path="/articles/new" element={<NewArticle />} />
         <Route path="/articles/:articleId" element={<ArticleDetailPage />} />
         <Route path="/articles/:articleId/status" element={<StatusPage />} />
@@ -26,6 +26,6 @@ function App() {
       </Routes>
     </>
   );
-}
+};
 
 export default App;

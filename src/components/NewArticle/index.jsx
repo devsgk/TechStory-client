@@ -38,8 +38,9 @@ export default function NewArticle() {
     const textContent = textEditorRef.current.textContent;
     const contentWithIndent = addIndent(content);
     const articleContent = correctTags(contentWithIndent);
+    const sanitizedArticleContent = DOMPurify.sanitize(articleContent);
 
-    setInput(articleContent);
+    setInput(sanitizedArticleContent);
     setIsEditing((prev) => !prev);
     setShowTitleError(false);
 
@@ -48,7 +49,7 @@ export default function NewArticle() {
       {
         withCredentials: true,
         user,
-        articleContent,
+        articleContent: sanitizedArticleContent,
         articleId,
         textContent,
         title,
