@@ -123,7 +123,7 @@ export default function Header() {
 
   function handleMyArticlesClick() {
     setIsUserNameClicked(false);
-    navigate(`/users/${user._id}/articles`);
+    navigate(`/users/${user!._id}/articles`);
   }
 
   useEffect(() => {
@@ -173,7 +173,7 @@ export default function Header() {
               className="ml-10 px-4 py-1 bg-black text-white rounded-full"
               onClick={handleUserNameClick}
             >
-              {user.displayName}
+              {user!.displayName}
             </button>
             {isUserNameClicked && (
               <div className="absolute top-[65px] right-30 flex flex-col rounded  bg-white shadow-xl border">

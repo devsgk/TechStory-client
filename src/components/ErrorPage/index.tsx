@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 
-function ErrorPage({ errorMessage }) {
+type ErrorMessageProps = {
+  errorMessage: string;
+};
+
+function ErrorPage({ errorMessage }: ErrorMessageProps) {
   return (
     <div className="mt-10 text-center text-4xl font-bold">
       <p>{errorMessage}</p>
