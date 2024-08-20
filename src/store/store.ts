@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { UserType, UserStore, defaultUser } from "types/types";
+import { UserType, UserStore, defaultUser } from "../types/types";
 
 const useUserStore = create<UserStore>((set) => ({
   identity: "unAuthorized",
